@@ -14,7 +14,7 @@ Best submission on each of the five kernel boards and on the serving track.
 | [decode_layer](kernel/decode_layer/README.md) · [attention_decode](kernel/attention_decode/README.md) · [moe_w4a16](kernel/moe_w4a16/README.md) · [bf16_proj](kernel/bf16_proj/README.md) · [prefill_layer](kernel/prefill_layer/README.md) | Per-board score history, attempts, dead ends |
 | [serving](serving/README.md) | Serving score history, attempts, dead ends |
 | [AUTORESEARCH.md](AUTORESEARCH.md) | Agent-loop setup: harness, roles, runs, guardrails |
-| [NOTES.md](NOTES.md) | Rules and context |
+| [NOTES.md](NOTES.md) | Context |
 | [COST.md](COST.md) | GPU spend, judge usage, LLM tokens by model |
 
 ## Lineage
