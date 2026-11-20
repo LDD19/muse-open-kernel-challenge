@@ -1,0 +1,11 @@
+# Launch flags for your build, on top of the judge's (RULES.md, "Launch flags").
+# One per line: --name value, --name for a switch, --no name to drop one of the judge's.
+#
+# serving_tp8_delayer (2026-11-15) candidate vi_N2_mid (v3, N2 base; flag lines as iii_M2F_mid): our two flags (as scored 1eea962b) + the mid prefill delayer (arm X, scheduler-model pick)
+# (ratio 0.375, 6 passes; NOT run F setting; only if the session picks arm X). --prefill-max-requests 32 = --max-running-requests 32 = --cuda-graph-max-bs-decode 32.
+--swa-full-tokens-ratio 0.25
+--hicache-size 120
+--enable-prefill-delayer
+--prefill-delayer-queue-min-ratio 0.375
+--prefill-delayer-max-delay-passes 6
+--prefill-max-requests 32
