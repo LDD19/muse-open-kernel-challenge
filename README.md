@@ -7,6 +7,29 @@ Best submission on each of the five kernel boards and on the serving track.
 | Kernel track (closed 2026-11-05) | #55 on the final overall board |
 | Serving track (closed 2026-11-20) | **3.0811x** stock SGLang on 8 x H200, lossless |
 
+![hill climb, all boards](charts/overview.png)
+
+| Doc | Contents |
+|---|---|
+| [decode_layer](kernel/decode_layer/README.md) · [attention_decode](kernel/attention_decode/README.md) · [moe_w4a16](kernel/moe_w4a16/README.md) · [bf16_proj](kernel/bf16_proj/README.md) · [prefill_layer](kernel/prefill_layer/README.md) | Per-board score history, attempts, dead ends |
+| [serving](serving/README.md) | Serving score history, attempts, dead ends |
+| [AUTORESEARCH.md](AUTORESEARCH.md) | Agent-loop setup: harness, roles, runs, guardrails |
+| [NOTES.md](NOTES.md) | Rules and context |
+| [COST.md](COST.md) | GPU spend, judge usage, LLM tokens by model |
+
+## Lineage
+
+![lineage of every board](charts/lineage_all.png)
+
+| Box | Meaning |
+|---|---|
+| Blue border | Own version |
+| Gray fill | Public file or external code it builds on |
+| Dashed | Candidate that never became a board entry |
+| Faded | Retired branch |
+| Thick black border, BOARD | Final board entry |
+| Thick blue arrow | Piece ported from another board into decode_layer or serving |
+
 ## Kernel track
 
 One H200, each problem scored as speedup over the reference implementation.
@@ -23,13 +46,14 @@ One H200, each problem scored as speedup over the reference implementation.
 |---|---|
 | Scored runs | 126 |
 | Judge checks | 160 |
-| Best rank held during the track | decode #30, attention #32, moe #64, bf16 #27, prefill #23 |
+| Best rank held during the track | decode #30, attention #32, moe #47, bf16 #25, prefill #23 |
 
 ## Serving track
 
 A patch to SGLang for Muse Spark Open 816B-A42B NVFP4 with the DFlash2 drafter, TP8 = EP8 on 8 x H200. Scored over
 1 / 4 / 16 / 32 concurrent users on 13-turn agentic conversations (first turn ~74K tokens).
 
+- [`serving/README.md`](serving/README.md): score history and attempts
 - [`serving/FINAL_3r.diff`](serving/FINAL_3r.diff): the patch (`git apply` on SGLang `297e54fd`)
 - [`serving/FINAL_3r.notes.md`](serving/FINAL_3r.notes.md): reviewer notes
 - [`serving/flags`](serving/flags): launch flags
@@ -73,7 +97,7 @@ A patch to SGLang for Muse Spark Open 816B-A42B NVFP4 with the DFlash2 drafter, 
 | Part | Class |
 |---|---|
 | Sequence-parallel prefill after attention (layers 0-60): o-proj reduce-scatter, norms, router, pooler, experts, unpooler on T/8 rows per rank | order-only |
-| Hopper NVFP4 expert kernel (W4A16, stock's Hopper form) | bitwise |
+| Hopper NVFP4 expert kernel (W4A16, stock's Hopper form) | stock's math; <= 1 bf16 ulp run to run |
 | Copy-engine transports over CUDA IPC: next layer's qkv input, streamed attention output into o-proj, next layer's o weight | bitwise |
 | Per-forward copies of hot experts on lightly loaded ranks (chunks >= 4,096 rows) | bitwise |
 | Experts' reduce-scatter written by the expert kernel into the token owner's inbox, fixed ring-order sum | order-only |
@@ -89,9 +113,9 @@ changes with `LDD19:`.
 
 | Board | Built on | License |
 |---|---|---|
-| decode_layer | [vjeux/okc-2026](https://github.com/vjeux/okc-2026); [keell0renz/muse-open-kernel-challenge](https://github.com/keell0renz/muse-open-kernel-challenge); [Madhavan113/ParadigmKernelChallenge](https://github.com/Madhavan113/ParadigmKernelChallenge); [NathenFernandes/muse-bf16-proj](https://github.com/NathenFernandes/muse-bf16-proj) | Apache-2.0, MIT (Nathen) |
+| decode_layer | [vjeux/okc-2026](https://github.com/vjeux/okc-2026); [chenwainuo/okc](https://github.com/chenwainuo/okc); [keell0renz/muse-open-kernel-challenge](https://github.com/keell0renz/muse-open-kernel-challenge); [Madhavan113/ParadigmKernelChallenge](https://github.com/Madhavan113/ParadigmKernelChallenge); [NathenFernandes/muse-bf16-proj](https://github.com/NathenFernandes/muse-bf16-proj) | Apache-2.0, MIT (Nathen) |
 | attention_decode | [vjeux/okc-2026](https://github.com/vjeux/okc-2026) | Apache-2.0 |
 | moe_w4a16 | [vjeux/okc-2026](https://github.com/vjeux/okc-2026); [keell0renz/muse-open-kernel-challenge](https://github.com/keell0renz/muse-open-kernel-challenge); [Madhavan113/ParadigmKernelChallenge](https://github.com/Madhavan113/ParadigmKernelChallenge) | Apache-2.0 |
-| bf16_proj | [NathenFernandes/muse-bf16-proj](https://github.com/NathenFernandes/muse-bf16-proj) | MIT |
+| bf16_proj | [NathenFernandes/muse-bf16-proj](https://github.com/NathenFernandes/muse-bf16-proj); [vjeux/okc-2026](https://github.com/vjeux/okc-2026); [chenwainuo/okc](https://github.com/chenwainuo/okc); [keell0renz/muse-open-kernel-challenge](https://github.com/keell0renz/muse-open-kernel-challenge) | MIT (Nathen), Apache-2.0 |
 | prefill_layer | [vjeux/okc-2026](https://github.com/vjeux/okc-2026); [ZhimaoL/sglang](https://github.com/ZhimaoL/sglang) | Apache-2.0 |
 | serving | [sgl-project/sglang](https://github.com/sgl-project/sglang) | Apache-2.0 |
